@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#11151f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="四级计划">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href='data:application/manifest+json,{"name":"四级每日计划","short_name":"四级计划","start_url":"./","display":"standalone","background_color":"%2311151f","theme_color":"%2311151f"}'>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2311151f'/%3E%3Ctext x='50' y='45' font-size='34' text-anchor='middle' fill='%235aa2ff' font-family='sans-serif' font-weight='bold'%3ECET%3C/text%3E%3Ctext x='50' y='76' font-size='30' text-anchor='middle' fill='%234ecb8b' font-family='sans-serif' font-weight='bold'%3E425%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2311151f'/%3E%3Ctext x='50' y='45' font-size='34' text-anchor='middle' fill='%235aa2ff' font-family='sans-serif' font-weight='bold'%3ECET%3C/text%3E%3Ctext x='50' y='76' font-size='30' text-anchor='middle' fill='%234ecb8b' font-family='sans-serif' font-weight='bold'%3E425%3C/text%3E%3C/svg%3E">
+<title>四级计划</title>
+<style>
+:root{
+  --bg:#11151f; --card:#1a2030; --card2:#222b3e; --line:#2b3550; --line2:#3a476a;
+  --tx:#e9eefb; --tx2:#9aa9c9; --tx3:#6a799b;
+  --blue:#5aa2ff; --green:#4ecb8b; --amber:#f5bb45; --red:#f2637a;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--tx); font-size:16px; line-height:1.55;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; padding-bottom:calc(18px + var(--sb));
+}
+.wrap{max-width:620px;margin:0 auto;padding:14px 13px 0}
+.hide{display:none!important}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.top .d{font-size:19px;font-weight:700}
+.top .m{font-size:12.5px;color:var(--tx2);margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;font-weight:600;margin-right:5px}
+.b1{background:rgba(90,162,255,.16);color:#8dbcff}
+.b2{background:rgba(167,139,250,.16);color:#c3adff}
+.b3{background:rgba(245,187,69,.16);color:#f8d27a}
+.days{text-align:right;flex:0 0 auto}
+.days .n{font-size:25px;font-weight:800;color:var(--green);line-height:1}
+.days .l{font-size:10.5px;color:var(--tx3)}
+
+.nav{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 9px;margin-bottom:10px}
+.nav button{background:var(--card2);border:1px solid var(--line2);color:var(--tx);width:36px;height:36px;border-radius:9px;font-size:18px;flex:0 0 auto;font-family:inherit}
+.nav button:active{background:var(--line2)}
+.nav .t{flex:1;text-align:center;font-size:13.5px}
+.nav .t b{color:var(--blue)}
+
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.mode{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 3px;text-align:center}
+.mode.on{background:rgba(90,162,255,.15);border-color:var(--blue)}
+.mode .a{font-size:14px;font-weight:700}
+.mode .b{font-size:10px;color:var(--tx3);margin-top:1px}
+.mode.on .b{color:#93c1ff}
+
+.task{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;display:flex;gap:11px}
+.task.done{opacity:.45}
+.task.done .tt{text-decoration:line-through;color:var(--tx3)}
+.cb{width:28px;height:28px;border-radius:9px;border:2px solid var(--line2);flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:16px;color:transparent;font-weight:800}
+.task.done .cb{background:var(--green);border-color:var(--green);color:#11151f}
+.tm{flex:1;min-width:0}
+.th{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.tt{font-size:15.5px;font-weight:650}
+.du{font-size:11px;color:var(--blue);background:rgba(90,162,255,.13);padding:1px 6px;border-radius:6px;font-weight:600}
+.td{font-size:13px;color:var(--tx2);margin-top:3px}
+.slots{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.slot{font-size:10.5px;color:var(--tx3);background:#151b28;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.tip{font-size:12.5px;color:var(--amber);background:rgba(245,187,69,.09);border-left:2px solid var(--amber);border-radius:6px;padding:6px 9px;margin-top:8px}
+details.mo{margin-top:8px}
+details.mo>summary{font-size:12.5px;color:var(--blue);list-style:none}
+details.mo>summary::-webkit-details-marker{display:none}
+details.mo>summary::before{content:'▸ '}
+details.mo[open]>summary::before{content:'▾ '}
+ol.st{margin:7px 0 0;padding:0;list-style:none;counter-reset:s}
+ol.st li{counter-increment:s;font-size:12.5px;color:var(--tx2);padding:5px 0 5px 24px;position:relative;border-top:1px dashed var(--line)}
+ol.st li:first-child{border-top:none}
+ol.st li::before{content:counter(s);position:absolute;left:0;top:6px;width:17px;height:17px;border-radius:50%;background:var(--card2);color:var(--blue);font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+.pbar{height:7px;background:#161d2b;border-radius:99px;overflow:hidden;margin:12px 0 5px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:99px;transition:width .3s}
+.ptx{font-size:12px;color:var(--tx3);text-align:center;margin-bottom:14px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}
+.card h2{font-size:14.5px;margin:0 0 3px;font-weight:700}
+.card .de{font-size:12.5px;color:var(--tx3);margin-bottom:9px}
+.g3s{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.stat{background:#161d2b;border:1px solid var(--line);border-radius:11px;padding:10px 6px;text-align:center}
+.stat .v{font-size:19px;font-weight:800;color:var(--blue)}
+.stat .k{font-size:10.5px;color:var(--tx3);margin-top:1px}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:9px}
+.wk i{aspect-ratio:1;border-radius:7px;background:#161d2b;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--tx3);font-style:normal}
+.wk i.ok{background:rgba(78,203,139,.85);border-color:var(--green);color:#11151f;font-weight:700}
+.wk i.pa{background:rgba(245,187,69,.32);border-color:var(--amber);color:#f8d27a}
+.wk i.td{border-color:var(--blue);border-width:2px}
+.wk i.fu{opacity:.35}
+.warn{font-size:12.5px;color:var(--red);background:rgba(242,99,122,.09);border-left:2px solid var(--red);border-radius:6px;padding:6px 9px;margin-top:9px}
+.ok{font-size:12.5px;color:var(--green);background:rgba(78,203,139,.09);border-left:2px solid var(--green);border-radius:6px;padding:6px 9px;margin-top:9px}
+.dayline{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:6px 2px;border-bottom:1px dashed var(--line)}
+.dayline:last-child{border-bottom:none}
+.dayline .pct{color:var(--tx3)}
+
+label.f{display:block;font-size:12.5px;color:var(--tx2);margin:11px 0 5px;font-weight:600}
+input[type=date],input[type=number],input[type=text]{
+  width:100%;background:#161d2b;border:1px solid var(--line2);border-radius:10px;color:var(--tx);
+  padding:10px 11px;font-size:15px;font-family:inherit;outline:none;-webkit-appearance:none;appearance:none;min-height:42px
+}
+input:focus{border-color:var(--blue)}
+.btn{width:100%;background:var(--blue);border:none;color:#0a1626;font-size:15px;font-weight:700;padding:12px;border-radius:11px;margin-top:11px;font-family:inherit}
+.btn:active{opacity:.85}
+.btn.g{background:var(--green)}
+.btn.r{background:transparent;border:1px solid var(--red);color:var(--red);font-weight:600}
+.hint{font-size:11.5px;color:var(--tx3);margin-top:5px}
+.mode2{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.tab2{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center;font-size:13.5px;font-weight:600}
+.tab2.on{background:rgba(90,162,255,.15);border-color:var(--blue);color:#a8cdff}
+.rw{margin-bottom:10px}
+.rw .q{font-size:13px;margin-bottom:5px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line2);color:var(--tx);font-size:13px;padding:9px 16px;border-radius:99px;z-index:99;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.on{opacity:1}
+.mask{position:fixed;inset:0;background:rgba(8,11,18,.92);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.sheet{background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:19px;max-width:430px;width:100%;max-height:84vh;overflow:auto}
+.sheet h3{margin:0 0 8px;font-size:17px}
+.sheet p{font-size:13.5px;color:var(--tx2);line-height:1.75;margin:0 0 9px}
+.foot{text-align:center;font-size:11px;color:var(--tx3);padding:12px 0 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="d" id="hD">—</div>
+      <div class="m" id="hM"></div>
+    </div>
+    <div class="days"><div class="n" id="hDays">--</div><div class="l">距考试</div></div>
+  </div>
+
+  <div class="nav">
+    <button id="bPrev">‹</button>
+    <div class="t" id="navT"></div>
+    <button id="bNext">›</button>
+  </div>
+
+  <div class="g3" id="modes"></div>
+  <div id="tasks"></div>
+  <div class="pbar"><i id="pBar" style="width:0%"></i></div>
+  <div class="ptx" id="pTx"></div>
+
+  <div class="card" id="wordCard">
+    <h2>今天实际背了多少词</h2>
+    <div class="de">只记中文意思，不背拼写，<b>必须开声音跟读</b>。数字自动保存。</div>
+    <input type="number" id="wCnt" min="0" max="400" inputmode="numeric" placeholder="例如 40">
+    <div class="hint" id="wHint"></div>
+  </div>
+
+  <div class="mode2">
+    <div class="tab2 on" data-v="today" id="tabToday">今日任务</div>
+    <div class="tab2" data-v="prog" id="tabProg">进度</div>
+  </div>
+
+  <div id="vProg" class="hide">
+    <div class="card">
+      <h2>总览</h2>
+      <div class="g3s" style="margin-top:8px">
+        <div class="stat"><div class="v" id="sD">0</div><div class="k">已学天数</div></div>
+        <div class="stat"><div class="v" id="sT">0</div><div class="k">完成小项</div></div>
+        <div class="stat"><div class="v" id="sS">0</div><div class="k">连续天数</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>本周</h2>
+      <div class="de" id="wRange"></div>
+      <div class="wk" id="wCells"></div>
+      <div id="wNote"></div>
+    </div>
+    <div class="card">
+      <h2>每天完成情况</h2>
+      <div class="de">从计划开始到今天，点任意一天可回到那天</div>
+      <div id="hist"></div>
+    </div>
+    <div class="card">
+      <h2>周复盘</h2>
+      <div class="de">每周日填 4 个问题，会给你下周调整建议</div>
+      <div class="rw"><div class="q">1. 本周完成几天？</div><input type="text" id="r1" placeholder="例如 5 天"></div>
+      <div class="rw"><div class="q">2. 仔细阅读对了几题？</div><input type="text" id="r2" placeholder="例如 每篇对 3 题"></div>
+      <div class="rw"><div class="q">3. 听力单句能听出几个词？</div><input type="text" id="r3" placeholder="例如 5 句能听出 3 句"></div>
+      <div class="rw"><div class="q">4. 下周最想先解决什么？</div><input type="text" id="r4" placeholder="单词 / 定位 / 听力关键词"></div>
+      <button class="btn" id="bReview">保存并给建议</button>
+      <div id="rOut"></div>
+    </div>
+  </div>
+
+  <div id="vSet" class="hide">
+    <div class="card">
+      <h2>时间设置</h2>
+      <label class="f">计划开始日期</label>
+      <input type="date" id="fStart">
+      <label class="f">考试日期</label>
+      <input type="date" id="fExam">
+      <label class="f">每天目标背词量</label>
+      <input type="number" id="fWords" min="0" max="400" inputmode="numeric">
+      <div class="hint" id="planInfo"></div>
+    </div>
+    <div class="card">
+      <h2>数据</h2>
+      <div class="de">全部存在这台手机里，不上传。换手机用备份搬迁。</div>
+      <button class="btn g" id="bExp">导出备份</button>
+      <button class="btn" id="bImp">导入备份</button>
+      <input type="file" id="fImp" accept=".json,application/json" class="hide">
+      <button class="btn r" id="bClr">清空记录</button>
+    </div>
+    <div class="card">
+      <h2>红线提醒</h2>
+      <ol class="st">
+        <li><b>只刷真题</b>，模拟题一题不碰</li>
+        <li><b>不断档</b>：每天至少完成单词 + 精读</li>
+        <li><b>听力开声音</b>：背单词必须跟读</li>
+        <li><b>不精读 Section B 全文</b>，只复盘错题对应句</li>
+        <li><b>写译练字</b>，卷面能多 3-5 分</li>
+        <li><b>别急</b>：前两周只求习惯</li>
+      </ol>
+    </div>
+    <div class="foot">四级每日计划 · 本地版</div>
+  </div>
+
+  <button class="btn" id="bSet" style="background:transparent;border:1px solid var(--line2);color:var(--tx2);font-size:13px;font-weight:600;margin-bottom:14px">设置 / 备份</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== 数据与存储 ===================== */
+var KEY='cet4plan.v2';
+var DEF_START='2026-10-03';
+var DEF_EXAM='2026-12-12';
+
+/* 阶段只按「周号」定义，日期由 S.start 推导 —— 避免日期与周号两套坐标漂移 */
+var PHASES=[
+  {id:1,name:'打地基',cls:'b1',w1:1,w2:4,wk:'第 1-4 周',
+   goal:'单词打底 + 听力单句 + 仔细阅读精读'},
+  {id:2,name:'上套路',cls:'b2',w1:5,w2:8,wk:'第 5-8 周',
+   goal:'整篇听力 + 分题型 + 每周六模考'},
+  {id:3,name:'磨状态',cls:'b3',w1:9,w2:99,wk:'第 9 周起至考前',
+   goal:'隔天模考 + 写译模板 + 错题复盘'}
+];
+
+var SCHEDULE=[
+  {id:'morning',t:'早读复习',du:'20min',sl:['7:00-7:20'],
+   d:'快速过昨天背的新词，遮住中文回忆意思，不熟的标记。'},
+  {id:'noon',t:'午休听力',du:'15min',sl:['12:30-12:45'],
+   d:'听昨天那 5 个单句，当 BGM 循环 2 遍，抓关键词。'},
+  {id:'words',t:'单词新学',du:'30min',sl:['18:30-19:00'],
+   d:'40 新 + 120 旧，只记中文意思，不背拼写，必须开声音跟读。'},
+  {id:'main',t:'主专项',du:'40min',sl:['19:00-19:40'],d:''},
+  {id:'listen',t:'听力训练',du:'20min',sl:['19:40-20:00'],d:''},
+  {id:'write',t:'写译积累',du:'15min',sl:['20:00-20:15'],
+   d:'抄 5 个模板句（中英对照），或翻译 3 句。'},
+  {id:'review',t:'复盘',du:'15min',sl:['20:15-20:30'],
+   d:'整理今天不熟的 5 个生词 + 1 个错题原因。'}
+];
+
+var MAIN={
+  1:{t:'阅读精读（仔细阅读 1 篇）',du:'40min',sl:['19:00-19:40'],
+     d:'不限时，先正常做一遍，再按「6 步拆解」把这篇吃透。',
+     st:['做题：不限时，先正常做一遍',
+         '对答案：只标对错，不看解析',
+         '标定位句：每道题回原文画出答案句',
+         '拆主谓宾：先找「谁 + 做了什么 + 什么结果」，定语状语插入语全用括号括掉',
+         '查生词：只查定位句和选项里的生词，抄成「英文 - 词性 - 中文」，一篇最多 20 个',
+         '找同义替换：题干/正确选项和原文的替换对抄本子，例如 growing = increasing'],
+     tip:'错题只问两个问题：① 答案在原文哪一句？我找到了吗？ ② 是单词不认识，还是主谓宾没抓对？'},
+  2:{t:'听力单句 ×5（当天重点）',du:'30min',sl:['19:00-19:30'],
+     d:'今天主专项就是听力。从真题 Section C 原文挑 5 个短句。',
+     st:['盲听：不看原文，听 3 遍，写下听到的所有词',
+         '对原文：圈出没听出的词，标连读/弱读/吞音',
+         '跟读：大声跟读 5 遍，模仿语音语调',
+         '再盲听 1 遍，看多听出几个词'],
+     tip:'只能抓 hi / what 是正常的，你在补的是「听力词汇的发音」，不是做题技巧。'},
+  3:{t:'阅读定位 + 听力单句',du:'40min',sl:['19:00-19:40'],
+     d:'先做 1 篇仔细阅读：限时 15 分钟，对答案后标出每道题的定位句；剩下时间练 5 个听力单句。',
+     st:['仔细阅读 1 篇，限时 15 分钟','对答案，只标对错',
+         '每道题回原文画出定位句，标不出来就是定位问题',
+         '错题写一个主因：A 单词不认识 / B 主谓宾没抓对 / C 同义替换没认出 / D 选项方向看反'],
+     tip:'限时做不完也没关系，先保证「每道题都能在原文指出答案句」。'},
+  4:{t:'听力单句 + 写译抄写',du:'40min',sl:['19:00-19:40'],
+     d:'5 个听力单句（盲听→看原文→跟读），加抄 1 篇范文并划出模板句。',
+     st:['听力单句 5 句，按 5 步做','抄 1 篇写作范文（用横线本，刻意练字）',
+         '把范文里的模板句/连接词用荧光笔划出来','背其中 2 个框架句，不要整篇背'],
+     tip:'卷面工整能多拿 3-5 分，抄写就是练字，别用草书。'},
+  5:{t:'Section B 段落匹配 1 篇',du:'40min',sl:['19:00-19:40'],
+     d:'限时 15 分钟，只复盘错题对应句，绝对不精读全文。',
+     st:['先读 10 个题干，每个题干圈 2-3 个定位词（大写、数字、专有名词、独特名词/动词）',
+         '回原文扫读，找定位词或同义替换，找到就选，不纠结',
+         '限时 12-15 分钟，到点没做完就先蒙',
+         '错题只做一件事：找出题干和原文的对应句，把同义替换对抄到本子上'],
+     tip:'Section B 是「找同义替换」的游戏，不是「读懂全文」的考试。一篇里超过 6 个题干有生词，今天改去背单词。'}
+};
+
+var DOW=['周日','周一','周二','周三','周四','周五','周六'];
+
+function blank(){
+  return {v:2,start:DEF_START,exam:DEF_EXAM,wordsPerDay:40,cur:today(),mode:'std',
+          done:{},words:{},reviews:{},onboarded:false};
+}
+var S=load();
+function load(){
+  try{
+    var r=localStorage.getItem(KEY); if(!r) return blank();
+    var o=JSON.parse(r), b=blank();
+    for(var k in b){ if(!(k in o)) o[k]=b[k]; }
+    return o;
+  }catch(e){ return blank(); }
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){ toast('保存失败：存储不可用'); } }
+
+/* ===================== 日期 ===================== */
+function p2(n){ n=String(n); return n.length<2?'0'+n:n; }
+function today(){ var d=new Date(); return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()); }
+function iso(d){ return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate()); }
+function pd(s){ var a=s.split('-'); return new Date(+a[0],+a[1]-1,+a[2]); }
+function addD(s,n){ var d=pd(s); d.setDate(d.getDate()+n); return iso(d); }
+function diff(a,b){ return Math.round((pd(b)-pd(a))/86400000); }
+function dow(s){ return pd(s).getDay(); }
+function show(s){ var d=pd(s); return (d.getMonth()+1)+'月'+d.getDate()+'日'; }
+function weekNo(s){ return Math.floor(diff(S.start,s)/7)+1; }
+function weekStart(s){ return addD(s,-dow(s)); }
+/* 阶段的日期区间由周号推导，保证与「第几周」永远一致 */
+function phaseOf(s){
+  var wk=weekNo(s);
+  for(var i=0;i<PHASES.length;i++){
+    if(wk>=PHASES[i].w1&&wk<=PHASES[i].w2) return PHASES[i];
+  }
+  return wk<PHASES[0].w1?PHASES[0]:PHASES[PHASES.length-1];
+}
+
+/* ===================== 任务生成 ===================== */
+function build(date){
+  var w=dow(date), wk=weekNo(date), list=[], dn=S.done[date]||{};
+  function put(o){ o.done=!!dn[o.id]; list.push(o); }
+
+  if(w===0){
+    if(wk===1){
+      put({id:'s1',t:'仔细阅读 1 篇（不限时）',du:'40min',sl:['任意整块'],
+        d:'先正常做一遍，做完就停。对答案后每道题回原文标出答案句/定位句。',
+        tip:'今天不追求正确率，只追求把「定位句」标出来。标不出来才是定位问题。'});
+      put({id:'s2',t:'听力单句 5 句',du:'20min',sl:['任意碎片'],
+        d:'盲听 3 遍写词 → 看原文圈没听出的 → 跟读 5 遍。'});
+      put({id:'s3',t:'单词 40 个（只记意思）',du:'30min',sl:['任意碎片'],
+        d:'用你自己的 APP 选四级核心高频词库，只记中文意思，不背拼写，开声音跟读。'});
+      put({id:'s4',t:'抄写译框架 5 句',du:'20min',sl:['晚上'],
+        d:'现象分析类和解决问题类各挑几句抄，顺手练字，先熟悉框架。'});
+      put({id:'s5',t:'复盘 5 个生词',du:'15min',sl:['睡前'],d:'只记 5 个，不贪多。'});
+      put({id:'s6',t:'准备好明天的资料',du:'10min',sl:['睡前'],
+        d:'把真题、答题卡、计时器、横线本放在桌上。',
+        tip:'第 1 周唯一目标：不断档。今天做了，明天继续做，哪怕只完成一半。'});
+      return list;
+    }
+    put({id:'s1',t:'错题重做（仔细阅读）',du:'40min',sl:['上午'],
+      d:'重做本周错得最多的仔细阅读，每道错题回原文找定位句，逐句翻译定位句，不认识的词查出来。',
+      tip:'错因只写一句：定位错？同义替换没认出？主谓宾没抓对？'});
+    put({id:'s2',t:'重听 + 跟读（听力）',du:'20min',sl:['上午'],
+      d:'选本周错最多的一篇 Section C，对照原文再听 1 遍，圈出答案句，跟读 3 遍。',
+      tip:'重点听信号词：however / therefore / research shows / for example / in conclusion'});
+    put({id:'s3',t:'背写译框架 2 套',du:'30min',sl:['下午'],
+      d:'现象分析类 + 解决问题类各 1 套，默写框架句。'});
+    put({id:'s4',t:'翻译 1 篇 / 3 句',du:'20min',sl:['下午'],
+      d:'先自己写主谓宾，再补修饰成分。不会的词用上位词替代（例：雕琢 → make）。'});
+    put({id:'s5',t:'单词 40 新 + 复习旧',du:'30min',sl:['下午'],
+      d:'只记中文意思，不背拼写，必须开声音跟读。'});
+    put({id:'s6',t:'周复盘 4 问',du:'10min',sl:['晚上'],
+      d:'在「进度 → 周复盘」里填 4 个问题，填完会给你下周调整建议。'});
+    return list;
+  }
+
+  if(w===6){
+    if(wk<=3){      put({id:'a1',t:'轻量摸底：仔细阅读 1 篇',du:'',sl:['上午 9:00-10:00'],
+        d:'从真题里选 1 篇仔细阅读，不限时，做完就停。',
+        tip:'前 3 周不做完整模考，模考是检验不是练习。'});
+      put({id:'a2',t:'轻量摸底：听力 Section C 2 篇',du:'',sl:['上午 9:00-10:00'],
+        d:'先看选项圈关键词，盲听抓主题，再盲听抓关键词，最后对原文圈答案句。'});
+      put({id:'a3',t:'对答案：只标答案句/定位句',du:'30min',sl:['10:00-10:30'],
+        d:'只看对错，不看解析。在原文标出每道题的答案句/定位句。'});
+      put({id:'a4',t:'单词 40 新 + 复习旧',du:'30min',sl:['下午'],d:'只记中文意思，开声音跟读。'});
+      put({id:'a5',t:'抄写作模板 5 句',du:'20min',sl:['下午'],d:'用横线本抄，顺手练字。'});
+      put({id:'a6',t:'复盘 5 个生词',du:'15min',sl:['晚上'],d:'整理今天遇到的 5 个生词。'});
+      return list;
+    }
+    if(wk===4){
+      put({id:'a1',t:'半套模考：听力 + 阅读',du:'',sl:['9:00-11:20'],
+        d:'只做听力和阅读，严格计时，不写作文和翻译。',
+        tip:'现在可以开始计时了：单词过了一轮、精读做了 5 篇以上。'});
+      put({id:'a2',t:'对答案：统计听力 + 阅读',du:'60min',sl:['下午'],
+        d:'重点看「听力 + 阅读」合计有没有到 240 分。',
+        tip:'阅读+听力 ≥ 240 分是安全线；不到就每天加 30 分钟，优先加在仔细阅读精读上。'});
+      put({id:'a3',t:'记录错题分布',du:'30min',sl:['下午'],
+        d:'听力错在哪个 Section？阅读错在仔细阅读还是匹配？'});
+      put({id:'a4',t:'单词 40 新 + 复习旧',du:'30min',sl:['晚上'],d:'别因为模考就断掉单词。'});
+      return list;
+    }
+    if(wk<=8){
+      put({id:'a1',t:'完整模考（含写译）',du:'',sl:['9:00-11:20'],
+        d:'完整一套真题，严格计时。写作 30 分钟不超时，听力边听边涂卡。'});
+      put({id:'a2',t:'对答案：统计三项分数',du:'90min',sl:['14:00-15:30'],
+        d:'只统计听力、阅读、写译各项分数，不纠结具体题。',
+        tip:'算一下阅读+听力有没有到 240 分安全线。'});
+      put({id:'a3',t:'记录错题分布',du:'30min',sl:['15:30-16:00'],
+        d:'听力错在哪个 Section？阅读错在仔细阅读还是匹配？'});
+      put({id:'a4',t:'单词 40 新 + 复习旧',du:'30min',sl:['下午/晚上'],d:'别因为模考就断掉单词。'});
+      return list;
+    }
+    put({id:'a1',t:'完整模考（隔天节奏）',du:'',sl:['9:00-11:20'],
+      d:'冲刺阶段隔天模考。严格计时：写作 30 分钟不超时，听力边听边涂卡，阅读最后留 10 分钟蒙选词填空。'});
+    put({id:'a2',t:'对答案 + 统计三项分数',du:'90min',sl:['14:00-15:30'],d:'重点看总分和三项的短板。'});
+    put({id:'a3',t:'错题分布 + 写译批改',du:'40min',sl:['15:30-16:10'],
+      d:'记录错题分布；作文用批改网或 APP 检查语法，重点看模板句有没有用对位置。'});
+    return list;
+  }
+
+  var m=MAIN[w];
+  if(S.mode==='m30'){
+    put({id:'morning',t:'单词复习（APP 刷旧词）',du:'15min',sl:['任意碎片'],
+      d:'只刷旧词，遮中文回忆意思。',tip:'30 分钟保底版：单词复习 + 听 5 个单句。'});
+    put({id:'listen',t:'听力单句 5 句',du:'15min',sl:['任意碎片'],
+      d:'盲听 3 遍 → 看原文 → 跟读 5 遍。'});
+    return list;
+  }
+  if(S.mode==='h1'){
+    put({id:'words',t:'单词',du:'20min',sl:['任意整块'],
+      d:'能背多少背多少，优先核心高频，必须开声音跟读。'});
+    put({id:'main',t:m.t,du:'40min',sl:['任意整块'],d:m.d,st:m.st,tip:m.tip});
+    return list;
+  }
+  for(var i=0;i<SCHEDULE.length;i++){
+    var s=SCHEDULE[i];
+    if(s.id==='main'){
+      put({id:'main',t:m.t,du:m.du,sl:m.sl,d:m.d,st:m.st,tip:m.tip});
+    }else if(s.id==='listen'){
+      var d2=(w===2||w===4)
+        ?'今天主专项已经练听力了，这里做「隔天复习」：把昨天那 5 句再盲听一遍。'
+        :'5 个单句：盲听 3 遍 → 对原文标连读/弱读/吞音 → 跟读 5 遍。';
+      put({id:'listen',t:s.t,du:s.du,sl:s.sl,d:d2});
+    }else{
+      put({id:s.id,t:s.t,du:s.du,sl:s.sl,d:s.d});
+    }
+  }
+  return list;
+}
+
+/* ===================== 渲染 ===================== */
+function $(i){ return document.getElementById(i); }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+var tm;
+function toast(m){ var e=$('toast'); e.textContent=m; e.className='toast on';
+  clearTimeout(tm); tm=setTimeout(function(){ e.className='toast'; },1900); }
+
+function render(){
+  var date=S.cur, w=dow(date), ph=phaseOf(date), wk=weekNo(date), list=build(date);
+  $('hD').textContent=show(date)+' '+DOW[w];
+  $('hM').innerHTML='<span class="badge '+ph.cls+'">'+ph.name+'</span>'+
+    '<span class="badge" style="background:rgba(78,203,139,.14);color:#77dcae">第 '+wk+' 周</span>'+
+    (S.mode==='std'?'约 2 小时 15 分':'');
+  var left=diff(today(),S.exam);
+  $('hDays').textContent=left>0?left:0;
+  $('navT').innerHTML=show(date)+' · '+DOW[w]+' · <b>'+(date===today()?'今天':'非今天')+'</b>';
+
+  var ms=[['std','2h15','标准版'],['h1','1h','只有 1 小时'],['m30','30m','只有 30 分钟']];
+  $('modes').innerHTML=ms.map(function(x){
+    return '<div class="mode '+(S.mode===x[0]?'on':'')+'" data-mode="'+x[0]+'">'+
+      '<div class="a">'+x[1]+'</div><div class="b">'+x[2]+'</div></div>'; }).join('');
+
+  $('tasks').innerHTML=list.map(function(t){
+    var st=t.st?'<details class="mo"><summary>展开 '+t.st.length+' 步做法</summary><ol class="st">'+
+      t.st.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ol></details>':'';
+    var tip=t.tip?'<div class="tip">'+esc(t.tip)+'</div>':'';
+    var sl=(t.sl&&t.sl.length)?'<div class="slots">'+t.sl.map(function(x){
+      return '<span class="slot">'+esc(x)+'</span>'; }).join('')+'</div>':'';
+    return '<div class="task '+(t.done?'done':'')+'" data-tg="'+t.id+'">'+
+      '<div class="cb">✓</div><div class="tm">'+
+      '<div class="th"><span class="tt">'+esc(t.t)+'</span>'+
+      (t.du?'<span class="du">'+t.du+'</span>':'')+'</div>'+
+      '<div class="td">'+esc(t.d||'')+'</div>'+st+tip+sl+'</div></div>'; }).join('');
+
+  var tot=list.length, dn=list.filter(function(t){ return t.done; }).length;
+  $('pBar').style.width=(tot?Math.round(dn/tot*100):0)+'%';
+  $('pTx').textContent='今日进度 '+dn+'/'+tot+' · '+(tot?Math.round(dn/tot*100):0)+'%';
+
+  $('wCnt').value=(S.words[date]===undefined?'':S.words[date]);
+  var tg=S.wordsPerDay, g=S.words[date];
+  $('wHint').innerHTML=(g===undefined)?'今天目标：<b>'+tg+' 新 + '+(tg*3)+' 旧</b>':
+    (g>=tg?'已达成今日目标（'+tg+' 个）':'距目标还差 '+(tg-g)+' 个');
+}
+
+function renderProg(){
+  var t=today(), keys=Object.keys(S.done), days=0, sum=0;
+  keys.forEach(function(d){
+    var n=Object.keys(S.done[d]).length;
+    if(n>0){ days++; sum+=n; }
+  });
+  var streak=0, c=t;
+  while(true){
+    var n=Object.keys(S.done[c]||{}).length;
+    if(n>0){ streak++; c=addD(c,-1); } else break;
+    if(diff(S.start,c)<-1) break;
+  }
+  $('sD').textContent=days; $('sT').textContent=sum; $('sS').textContent=streak;
+
+  var ws=weekStart(t), cells='', ok=0;
+  for(var i=0;i<7;i++){
+    var d=addD(ws,i), n=Object.keys(S.done[d]||{}).length, tot=build(d).length||1;
+    var r=n/tot, cls=r>=.8?'ok':(r>0?'pa':'');
+    if(r>=.8) ok++;
+    cells+='<i class="'+cls+(d===t?' td':'')+(d>t?' fu':'')+'" data-go="'+d+'">'+pd(d).getDate()+'</i>';
+  }
+  $('wRange').textContent=show(ws)+' ~ '+show(addD(ws,6))+' · 第 '+weekNo(t)+' 周';
+  $('wCells').innerHTML=cells;
+  var remain=6-dow(t);
+  $('wNote').innerHTML=(ok<5&&remain>=0)
+    ?'<div class="warn">本周已完成 '+ok+' 天，还剩 '+remain+' 天。规则：少于 5 天就下周减量，但<b>不中断</b>，优先保单词、听力和仔细阅读。</div>'
+    :'<div class="ok">本周已完成 '+ok+' 天，节奏保持住。</div>';
+
+  var hs=weekStart(S.start), rows='';
+  for(var j=0;j<84;j++){
+    var dd=addD(hs,j);
+    if(dd>t) break;
+    if(dd<S.start) continue;
+    var n2=Object.keys(S.done[dd]||{}).length, tot2=build(dd).length||1;
+    rows+='<div class="dayline" data-go="'+dd+'"><span>'+show(dd)+' '+DOW[dow(dd)]+'</span>'+
+      '<span class="pct">'+n2+'/'+tot2+' '+Math.round(n2/tot2*100)+'%</span></div>';
+  }
+  $('hist').innerHTML=rows||'<div class="hint">还没有记录，今天勾第一条就有数据了。</div>';
+
+  var rv=S.reviews[ws]||{};
+  $('r1').value=rv.r1||''; $('r2').value=rv.r2||'';
+  $('r3').value=rv.r3||''; $('r4').value=rv.r4||'';
+  $('rOut').innerHTML=rv.advice?'<div class="tip" style="margin-top:11px">'+rv.advice+'</div>':'';
+}
+
+function renderSet(){
+  $('fStart').value=S.start; $('fExam').value=S.exam; $('fWords').value=S.wordsPerDay;
+  var total=diff(S.start,S.exam)+1, left=diff(today(),S.exam);
+  $('planInfo').innerHTML='计划共 <b>'+total+'</b> 天；距考试还有 <b>'+(left>0?left:0)+'</b> 天。'+
+    (left<0?'<br>考试日期已过，请修改考试日期。':'');
+}
+
+/* ===================== 交互 ===================== */
+document.addEventListener('click',function(e){
+  var el=e.target.closest('[data-mode],[data-go],[data-tg]');
+  if(!el) return;
+  if(el.dataset.mode){ S.mode=el.dataset.mode; save(); render(); toast('已切换时间档'); return; }
+  if(el.dataset.go){ S.cur=el.dataset.go; save(); view('today'); render(); return; }
+  if(el.dataset.tg){
+    var d=S.cur, id=el.dataset.tg;
+    S.done[d]=S.done[d]||{};
+    if(S.done[d][id]){ delete S.done[d][id]; }
+    else{ S.done[d][id]=1; }
+    if(!Object.keys(S.done[d]).length) delete S.done[d];
+    save(); render();
+    if(S.done[d]&&S.done[d][id]) toast('完成一项');
+    return;
+  }
+});
+
+function view(v){
+  var isToday=(v==='today');
+  $('tasks').className=isToday?'':'hide';
+  $('modes').className=isToday?'g3':'hide';
+  $('wordCard').className=isToday?'card':'card hide';
+  $('vProg').className=(v==='prog')?'':'hide';
+  $('vSet').className=(v==='set')?'':'hide';
+  $('tabToday').className='tab2'+(isToday?' on':'');
+  $('tabProg').className='tab2'+(v==='prog'?' on':'');
+  window.scrollTo(0,0);
+  if(v==='prog') renderProg();
+  if(v==='set') renderSet();
+}
+
+$('tabToday').onclick=function(){ view('today'); };
+$('tabProg').onclick=function(){ view('prog'); };
+$('bSet').onclick=function(){
+  var on=!$('vSet').className.indexOf('hide');
+  if(on){ view('today'); this.textContent='设置 / 备份'; }
+  else{ view('set'); this.textContent='返回今日任务'; }
+};
+$('bPrev').onclick=function(){ S.cur=addD(S.cur,-1); save(); render(); };
+$('bNext').onclick=function(){ S.cur=addD(S.cur,1); save(); render(); };
+$('wCnt').oninput=function(){
+  var v=this.value;
+  if(v===''){ delete S.words[S.cur]; } else { S.words[S.cur]=Math.max(0,+v||0); }
+  save();
+  var tg=S.wordsPerDay, g=S.words[S.cur];
+  $('wHint').innerHTML=(g===undefined)?'今天目标：<b>'+tg+' 新 + '+(tg*3)+' 旧</b>':
+    (g>=tg?'已达成今日目标（'+tg+' 个）':'距目标还差 '+(tg-g)+' 个');
+};
+$('fStart').onchange=function(){ S.start=this.value||DEF_START; save(); render(); renderSet(); toast('开始日期已更新'); };
+$('fExam').onchange=function(){ S.exam=this.value||DEF_EXAM; save(); render(); renderSet(); toast('考试日期已更新'); };
+$('fWords').oninput=function(){ S.wordsPerDay=Math.max(0,+this.value||0); save(); render(); };
+
+$('bReview').onclick=function(){
+  var ws=weekStart(S.cur);
+  var rv={r1:$('r1').value,r2:$('r2').value,r3:$('r3').value,r4:$('r4').value};
+  var days=parseInt((rv.r1||'').replace(/[^0-9]/g,''))||0, out=[];
+  out.push(days<5?'本周完成少于 5 天 → <b>下周减量但不中断</b>：主专项从 40 分钟压到 25 分钟，先保单词 + 仔细阅读。'
+                 :'本周完成 '+days+' 天，节奏达标，下周维持强度。');
+  out.push('优先顺序永远是：<b>单词 → 仔细阅读精读 → 听力单句</b>，写译放周末补。');
+  if(/[01]|听不出|抓不到/.test(rv.r3||'')) out.push('听力还抓不到词 → 继续单句盲听 + 跟读，<b>背单词必须开声音</b>，这是根子。');
+  if(/定位/.test(rv.r4||'')) out.push('下周重点放定位：每篇仔细阅读都练「圈 2-3 个定位词 → 回原文扫读 → 标出答案句」。');
+  if(/单词/.test(rv.r4||'')) out.push('下周重点放单词：每天先完成 40 新再碰别的，没背完就不做新题。');
+  if(/听力|关键词/.test(rv.r4||'')) out.push('下周重点放听力：每天 5 句，坚持 7 天不断档，两周后再评估能否上整篇。');
+  var wkn=weekNo(ws);
+  out.push('下周模考：'+(wkn<3?'继续轻量摸底（1 篇仔细阅读 + 2 篇听力，不限时），不上完整模考。'
+    :(wkn<4?'周六做听力 + 阅读半套，严格计时，不写作文翻译。'
+    :'周六做完整模考（含写译），练时间分配。')));
+  rv.advice=out.join('<br>');
+  S.reviews[ws]=rv; save();
+  $('rOut').innerHTML='<div class="tip" style="margin-top:11px">'+rv.advice+'</div>';
+  toast('周复盘已保存');
+};
+$('bExp').onclick=function(){
+  var b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='四级计划备份-'+today()+'.json'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); },2000);
+  toast('已导出备份');
+};
+$('bImp').onclick=function(){ $('fImp').click(); };
+$('fImp').onchange=function(){
+  var f=this.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var o=JSON.parse(r.result);
+      if(!o||typeof o!=='object') throw 0;
+      var b=blank(); for(var k in b){ if(!(k in o)) o[k]=b[k]; }
+      S=o; save(); render(); renderSet(); toast('导入成功');
+    }catch(e){ toast('导入失败：文件格式不对'); }
+  };
+  r.readAsText(f);
+};
+$('bClr').onclick=function(){
+  if(confirm('确定清空全部记录？不可恢复，建议先导出备份。')){
+    var st=S.start, ex=S.exam, wp=S.wordsPerDay;
+    S=blank(); S.start=st; S.exam=ex; S.wordsPerDay=wp; S.onboarded=true;
+    save(); render(); renderSet(); toast('已清空记录');
+  }
+};
+
+/* ===================== 引导 ===================== */
+function onboard(){
+  if(S.onboarded) return;
+  var m=document.createElement('div'); m.className='mask';
+  m.innerHTML='<div class="sheet">'+
+    '<h3>打开就是今天该做的事</h3>'+
+    '<p>它负责：<b>今天做什么</b>、时间怎么分、时间不够怎么砍、做了没有、进度和复盘。</p>'+
+    '<p>它不管：单词表和真题原文 —— 用你自己的资料。</p>'+
+    '<p style="color:var(--amber)">点任意一条任务就能勾掉，自动保存。时间不够就点上面的「1h / 30m」自动降级。</p>'+
+    '<p style="color:var(--tx3);font-size:12.5px">第一周唯一目标：<b>不断档</b>。今天做了，明天继续做，哪怕只完成一半。</p>'+
+    '<button class="btn g" id="obOk">开始</button></div>';
+  document.body.appendChild(m);
+  m.querySelector('#obOk').onclick=function(){ S.onboarded=true; save(); m.remove(); };
+}
+
+/* ===================== 启动 ===================== */
+(function(){
+  if(!localStorage.getItem(KEY)) S.cur=today();
+  if(diff(S.start,today())>=0 && diff(today(),S.exam)>=0) S.cur=today();
+  view('today');
+  render();
+  onboard();
+})();
+</script>
+</body>
+</html>
